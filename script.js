@@ -45,9 +45,9 @@ function renderQuestion(q) {
 function checkAnswer(answer) {
   if (answer === currentQuestion.correct) {
     score++;
-    alert('✅ Poprawna odpowiedź!');
+    alert(' Poprawna odpowiedź!');
   } else {
-    alert(`❌ Zła odpowiedź! Poprawna to: ${currentQuestion.correct}`);
+    alert(` Zła odpowiedź! Poprawna to: ${currentQuestion.correct}`);
   }
   scoreEl.textContent = `Wynik: ${score}`;
   loadQuestion();
@@ -55,3 +55,4 @@ function checkAnswer(answer) {
 
 nextBtn.addEventListener('click', loadQuestion);
 loadQuestion();
+
