@@ -1,58 +1,59 @@
-async function fetchCharacters() {
-  const randomPage = Math.floor(Math.random() * 9) + 1;
-  const res = await fetch(`https://swapi.dev/api/people/?page=${randomPage}`);
-  const data = await res.json();
-  return data.results;
+let pytanie = document.getElementById("question");
+let odpowiedzi = document.getElementById("answers");
+let wynik = document.getElementById("score");
+let przycisk = document.getElementById("next");
+
+let punkty = 0;
+let poprawna = "";
+
+async function pobierzPostacie() {
+  let losowaStrona = Math.floor(Math.random() * 9) + 1;
+  let dane = await fetch("https://swapi.dev/api/people/?page=" + losowaStrona);
+  let json = await dane.json();
+  return json.results;
 }
 
-function generateQuestion(characters) {
-  const correct = characters[Math.floor(Math.random() * characters.length)];
-  const options = [correct.name];
-  while (options.length < 4) {
-    const random = characters[Math.floor(Math.random() * characters.length)].name;
-    if (!options.includes(random)) options.push(random);
+function stworzPytanie(postacie) {
+  let wylosowana = postacie[Math.floor(Math.random() * postacie.length)];
+  poprawna = wylosowana.name;
+
+  let mozliwe = [poprawna];
+  while (mozliwe.length < 4) {
+    let inna = postacie[Math.floor(Math.random() * postacie.length)].name;
+    if (!mozliwe.includes(inna)) {
+      mozliwe.push(inna);
+    }
   }
-  options.sort(() => Math.random() - 0.5);
-  const question = `Która postać ma wzrost ${correct.height} cm i kolor oczu ${correct.eye_color}?`;
-  return { question, correct: correct.name, options };
+
+  mozliwe.sort(() => Math.random() - 0.5);
+  pytanie.textContent = "Która postać ma wzrost " + wylosowana.height + " cm i kolor oczu " + wylosowana.eye_color + "?";
+
+  odpowiedzi.innerHTML = "";
+  for (let i = 0; i < mozliwe.length; i++) {
+    let b = document.createElement("button");
+    b.textContent = mozliwe[i];
+    b.addEventListener("click", function () {
+      sprawdzOdpowiedz(mozliwe[i]);
+    });
+    odpowiedzi.appendChild(b);
+  }
 }
 
-const questionEl = document.getElementById('question');
-const answersEl = document.getElementById('answers');
-const scoreEl = document.getElementById('score');
-const nextBtn = document.getElementById('next');
-
-let score = 0;
-let currentQuestion = null;
-
-async function loadQuestion() {
-  const characters = await fetchCharacters();
-  currentQuestion = generateQuestion(characters);
-  renderQuestion(currentQuestion);
+async function zaladujPytanie() {
+  let postacie = await pobierzPostacie();
+  stworzPytanie(postacie);
 }
 
-function renderQuestion(q) {
-  questionEl.textContent = q.question;
-  answersEl.innerHTML = '';
-  q.options.forEach(opt => {
-    const btn = document.createElement('button');
-    btn.textContent = opt;
-    btn.onclick = () => checkAnswer(opt);
-    answersEl.appendChild(btn);
-  });
-}
-
-function checkAnswer(answer) {
-  if (answer === currentQuestion.correct) {
-    score++;
-    alert(' Poprawna odpowiedź!');
+function sprawdzOdpowiedz(odpowiedz) {
+  if (odpowiedz == poprawna) {
+    alert(" Dobrze!");
+    punkty++;
   } else {
-    alert(` Zła odpowiedź! Poprawna to: ${currentQuestion.correct}`);
+    alert(" Źle! Poprawna odpowiedź to: " + poprawna);
   }
-  scoreEl.textContent = `Wynik: ${score}`;
-  loadQuestion();
+  wynik.textContent = "Wynik: " + punkty;
+  zaladujPytanie();
 }
 
-nextBtn.addEventListener('click', loadQuestion);
-loadQuestion();
-
+przycisk.addEventListener("click", zaladujPytanie);
+zaladujPytanie();
