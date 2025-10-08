@@ -1,84 +1,39 @@
-// ========== FUNKCJE "MODUŁOWE" ==========
-
-// pobiera losowych bohaterów z SWAPI
-async function fetchCharacters() {
-  try {
-    const randomPage = Math.floor(Math.random() * 9) + 1; // 9 stron postaci
-    const res = await fetch(`https://swapi.dev/api/people/?page=${randomPage}`);
-    const data = await res.json();
-    return data.results;
-  } catch (error) {
-    console.error("Błąd przy pobieraniu danych:", error);
-    return [];
-  }
+body {
+  background-color: black;
+  color: yellow;
+  font-family: 'Courier New', monospace;
+  text-align: center;
+  padding: 20px;
 }
 
-// tworzy pytanie i opcje odpowiedzi
-function generateQuestion(characters) {
-  if (!characters.length) {
-    return {
-      question: "Nie udało się załadować danych z SWAPI 😢",
-      correct: "",
-      options: []
-    };
-  }
-
-  const correct = characters[Math.floor(Math.random() * characters.length)];
-  const options = [correct.name];
-
-  while (options.length < 4) {
-    const random = characters[Math.floor(Math.random() * characters.length)].name;
-    if (!options.includes(random)) options.push(random);
-  }
-
-  options.sort(() => Math.random() - 0.5);
-
-  const question = `Która postać ma wzrost ${correct.height} cm i kolor oczu ${correct.eye_color}?`;
-  return { question, correct: correct.name, options };
+#quiz {
+  margin: 20px auto;
+  max-width: 500px;
 }
 
-// ========== GŁÓWNY KOD ==========
-
-const questionEl = document.getElementById('question');
-const answersEl = document.getElementById('answers');
-const scoreEl = document.getElementById('score');
-const nextBtn = document.getElementById('next');
-
-let score = 0;
-let currentQuestion = null;
-
-async function loadQuestion() {
-  questionEl.textContent = "Ładowanie pytania...";
-  answersEl.innerHTML = "";
-
-  const characters = await fetchCharacters();
-  currentQuestion = generateQuestion(characters);
-  renderQuestion(currentQuestion);
+button {
+  background: yellow;
+  border: none;
+  padding: 10px 20px;
+  margin-top: 10px;
+  cursor: pointer;
+  font-weight: bold;
 }
 
-function renderQuestion(q) {
-  questionEl.textContent = q.question;
-  answersEl.innerHTML = "";
-
-  q.options.forEach(opt => {
-    const btn = document.createElement("button");
-    btn.textContent = opt;
-    btn.onclick = () => checkAnswer(opt);
-    answersEl.appendChild(btn);
-  });
+button:hover {
+  background: orange;
 }
 
-function checkAnswer(answer) {
-  if (answer === currentQuestion.correct) {
-    score++;
-    alert("✅ Poprawna odpowiedź!");
-  } else {
-    alert(`❌ Zła odpowiedź! Poprawna to: ${currentQuestion.correct}`);
-  }
-  scoreEl.textContent = `Wynik: ${score}`;
+#answers button {
+  display: block;
+  width: 100%;
+  margin: 5px 0;
+  background: #222;
+  color: yellow;
+  border: 1px solid yellow;
 }
 
-nextBtn.addEventListener("click", loadQuestion);
-
-// Pierwsze pytanie:
-loadQuestion();
+#answers button:hover {
+  background: yellow;
+  color: black;
+}
